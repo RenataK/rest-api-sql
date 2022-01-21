@@ -10,8 +10,8 @@ const { Model, DataTypes } = require('sequelize');
 
 
 module.exports = (sequelize) => {
-  class Courses extends Model {}
-  Courses.init({
+  class Course extends Model {}
+  Course.init({
     title: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -63,9 +63,9 @@ module.exports = (sequelize) => {
     // userId (created in the model associations with the foreignKey property, and equals the id from the Users table)
   }, { sequelize });
 
-  Courses.associate = (models) => {
+  Course.associate = (models) => {
     // TODO Add associations.
-    Courses.belongsTo(models.Users, { 
+    Course.belongsTo(models.User, { 
       // as: 'director',
       foreignKey: {
         fieldName: 'courseId',
@@ -74,5 +74,5 @@ module.exports = (sequelize) => {
     });
   };
 
-  return Courses;
+  return Course;
 };

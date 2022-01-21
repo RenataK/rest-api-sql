@@ -3,8 +3,8 @@ const { Model, DataTypes } = require('sequelize');
 // const bcrypt = require('bcrypt'); //install first
 
 module.exports = (sequelize) => {
-  class Users extends Model {}
-  Users.init({
+  class User extends Model {}
+  User.init({
     firstName: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -77,9 +77,9 @@ module.exports = (sequelize) => {
     // }
   }, { sequelize });
 
-  Users.associate = (models) => {
+  User.associate = (models) => {
     // TODO Add associations.
-    Users.hasMany(models.Courses, { 
+    User.hasMany(models.Course, { 
       // as: 'director',
       foreignKey: {
         fieldName: 'userId',
@@ -88,5 +88,5 @@ module.exports = (sequelize) => {
     });
   };
 
-  return Users;
+  return User;
 };
