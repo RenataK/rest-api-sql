@@ -23,31 +23,28 @@ router.get('/users', authenticateUser, asyncHandler(async (req, res) => {
 }));
 
 // A /api/users POST route that will create a new user, set the Location header to "/", and return a 201 HTTP status code and no content.
-router.post('/users', asyncHandler(async(req, res) => {
-    await User.create(req.body);
-    res.status(201).json({ 
-        "location": '/',
-        // "message": "Account successfully created!" //no content
-    });
-}));
-// // Route that creates a new user.
-// router.post('/users', asyncHandler(async (req, res) => {
-//     try {
-//       await User.create(req.body);
-//       res.status(201).json({ "message": "Account successfully created!" });
-//     } catch (error) {
-//       if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
-//         const errors = error.errors.map(err => err.message);
-//         res.status(400).json({ errors });   
-//       } else {
-//         throw error;
-//       }
-//     }
-//   }));
+// Route that creates a new user.
+router.post('/users', asyncHandler(async (req, res) => {
+    try {
+      await User.create(req.body);
+      res.status(201).json({
+        location: "/",
+        "message": "Account successfully created!" //no content
+      });
+    } catch (error) {
+      if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+        const errors = error.errors.map(err => err.message);
+        res.status(400).json({ errors });   
+      } else {
+        throw error;
+      }
+    }
+  }));
 
 //Courses
 
 //A /api/courses GET route that will return all courses including the User associated with each course and a 200 HTTP status code.
+
 
 //A /api/courses/:id GET route that will return the corresponding course including the User associated with that course and a 200 HTTP status code.
 
