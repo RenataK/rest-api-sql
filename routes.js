@@ -13,7 +13,7 @@ const bcrypt = require('bcryptjs');
 router.get('/users', authenticateUser, asyncHandler(async (req, res) => {
     const user = req.currentUser;
     console.log(user);
-    resres.status(200).json({
+    res.status(200).json({
         firstName: user.firstName,
         lastName: user.lastName,
         emailAddress: user.emailAddress,
