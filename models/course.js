@@ -38,27 +38,27 @@ module.exports = (sequelize) => {
       },
       estimatedTime: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: 'Estimated time is required'
-        },
-        notEmpty: {
-          msg: 'Please provide an estimated time'
-        }
-      }
+      // allowNull: false,
+      // validate: {
+      //   notNull: {
+      //     msg: 'Estimated time is required'
+      //   },
+      //   notEmpty: {
+      //     msg: 'Please provide an estimated time'
+      //   }
+      // }
     },
     materialsNeeded: {
       type: DataTypes.STRING, 
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: 'Materials needed is required'
-        },
-        notEmpty: {
-          msg: 'Please provide the materials needed'
-        },
-      }
+      // allowNull: false,
+      // validate: {
+      //   notNull: {
+      //     msg: 'Materials needed is required'
+      //   },
+      //   notEmpty: {
+      //     msg: 'Please provide the materials needed'
+      //   },
+      // }
     },
     // userId (created in the model associations with the foreignKey property, and equals the id from the Users table)
   }, { sequelize });
@@ -66,9 +66,8 @@ module.exports = (sequelize) => {
   Course.associate = (models) => {
     // TODO Add associations.
     Course.belongsTo(models.User, { 
-      // as: 'director',
       foreignKey: {
-        fieldName: 'courseId',
+        fieldName: 'id', //courseId
         allowNull: false,
       } 
     });
