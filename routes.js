@@ -18,7 +18,7 @@ router.get('/users', authenticateUser, asyncHandler(async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         emailAddress: user.emailAddress,
-        password: user.password,
+        // password: user.password,
     });
 }));
 
@@ -42,7 +42,11 @@ router.post('/users', asyncHandler(async (req, res) => {
 
 //A /api/courses GET route that will return all courses including the User associated with each course and a 200 HTTP status code.
 router.get('/courses', asyncHandler(async(req, res) => {
-    const courses = await Course.findAll();
+    const courses = await Course.findAll({
+        include: [{
+            model: User,
+        }],
+    });
     res.status(200).json({courses});
 }));
 
@@ -63,8 +67,9 @@ router.get('/courses/:id', asyncHandler(async(req, res) => {
 //A /api/courses POST route that will create a new course, set the Location header to the URI for the newly created course, and return a 201 HTTP status code and no content.
 router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
     try {
-      await Course.create(req.body);
-      res.status(201).set('Location', '/').end();
+      const course = await Course.create(req.body);
+      //setting the URI for the created course
+      res.status(201).set('Location', '`/courses/${course.id}`').end();
     } catch (error) {
       if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
         const errors = error.errors.map(err => err.message);
@@ -77,7 +82,13 @@ router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
 
 //A /api/courses/:id PUT route that will update the corresponding course and return a 204 HTTP status code and no content.
 router.put('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
-    const course = await Course.findOne({
+  const user = req.currentUser;
+    // const course = await Course.findOne({
+    //     where: {
+    //         id: req.params.id
+    //     }
+    // });
+      await Course.update(req.body, {
         where: {
             id: req.params.id
         }
@@ -86,14 +97,15 @@ router.put('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
 }));
 
 //A /api/courses/:id DELETE route that will delete the corresponding course and return a 204 HTTP status code and no content.
-// router.delete('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
-//     const course = await Course.findOne({
-//         where: {
-//             id: req.params.id
-//         }
-//     });
-//     res.status(204).end();
-// }));
+router.delete('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
+    const course = await Course.findOne({
+        where: {
+            id: req.params.id
+        }
+    });
+    await course.destroy(course);
+    res.status(204).end();
+}));
 
 //exporting Router
 module.exports = router;

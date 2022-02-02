@@ -1,5 +1,6 @@
 'use strict';
 const { Model, DataTypes } = require('sequelize');
+// const { User } = require('./user');
 // const bcrypt = require('bcrypt'); //install first
 
 // title (String)
@@ -61,7 +62,10 @@ module.exports = (sequelize) => {
       // }
     },
     // userId (created in the model associations with the foreignKey property, and equals the id from the Users table)
-  }, { sequelize });
+  }, { 
+    // timestamps: false,
+    sequelize 
+  });
 
   Course.associate = (models) => {
     // TODO Add associations.

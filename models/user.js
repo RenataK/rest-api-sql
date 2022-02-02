@@ -63,8 +63,11 @@ module.exports = (sequelize) => {
         //   msg: 'The password should be between 8 and 20 characters in length'
         // }
       },
-    }
-  }, { sequelize });
+    },
+  }, 
+  { 
+    // timestamps: false,
+    sequelize });
 
   User.associate = (models) => {
     // TODO Add associations.
@@ -73,7 +76,12 @@ module.exports = (sequelize) => {
       foreignKey: {
         fieldName: 'userId',
         allowNull: false,
-      } 
+        validate: {
+          notNull: {
+            msg: 'Please login in to create a course'
+          }
+        }
+     } 
     });
   };
 
