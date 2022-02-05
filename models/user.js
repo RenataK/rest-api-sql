@@ -65,9 +65,7 @@ module.exports = (sequelize) => {
       },
     },
   }, 
-  { 
-    // timestamps: false,
-    sequelize });
+  { sequelize });
 
   User.associate = (models) => {
     // TODO Add associations.

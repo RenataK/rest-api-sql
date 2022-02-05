@@ -8,18 +8,18 @@ const { User, Course } = require('./models');
 const { authenticateUser } = require('./middleware/auth-user');
 const { asyncHandler } = require('./middleware/async-handler');
 const bcrypt = require('bcryptjs');
+const e = require('express');
 
 
 //A /api/users GET route that will return all properties and values for the currently authenticated User along with a 200 HTTP status code.
 router.get('/users', authenticateUser, asyncHandler(async (req, res) => {
-    const user = req.currentUser;
-    console.log(user);
-    res.status(200).json({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        emailAddress: user.emailAddress,
-        // password: user.password,
+    const users = await User.findOne({
+      where: {
+        emailAddress: req.currentUser.emailAddress
+      },
+        attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
     });
+    res.status(200).json({users});
 }));
 
 // A /api/users POST route that will create a new user, set the Location header to "/", and return a 201 HTTP status code and no content.
@@ -43,8 +43,10 @@ router.post('/users', asyncHandler(async (req, res) => {
 //A /api/courses GET route that will return all courses including the User associated with each course and a 200 HTTP status code.
 router.get('/courses', asyncHandler(async(req, res) => {
     const courses = await Course.findAll({
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
         include: [{
             model: User,
+            attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
         }],
     });
     res.status(200).json({courses});
@@ -52,13 +54,14 @@ router.get('/courses', asyncHandler(async(req, res) => {
 
 //A /api/courses/:id GET route that will return the corresponding course including the User associated with that course and a 200 HTTP status code.
 router.get('/courses/:id', asyncHandler(async(req, res) => {
-    const user = req.currentUser;
     const course = await Course.findOne({
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
         where: {
             id: req.params.id
         },
         include: [{
             model: User,
+            attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
         }]
     });
     res.status(200).json({course});
@@ -82,29 +85,24 @@ router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
 
 //A /api/courses/:id PUT route that will update the corresponding course and return a 204 HTTP status code and no content.
 router.put('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
-  const user = req.currentUser;
-    // const course = await Course.findOne({
-    //     where: {
-    //         id: req.params.id
-    //     }
-    // });
-      await Course.update(req.body, {
-        where: {
-            id: req.params.id
-        }
-    });
+  const course = await Course.findByPk(req.params.id);
+  if (course.userId == req.currentUser.id) {
+    await course.update(req.body);
     res.status(204).end();
+  } else {
+    res.status(403).json("Acess Denied");
+  }
 }));
 
 //A /api/courses/:id DELETE route that will delete the corresponding course and return a 204 HTTP status code and no content.
 router.delete('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
-    const course = await Course.findOne({
-        where: {
-            id: req.params.id
-        }
-    });
-    await course.destroy(course);
+  const course = await Course.findByPk(req.params.id);
+  if (course.userId == req.currentUser.id) {
+    await course.destroy(req.body);
     res.status(204).end();
+  } else {
+    res.status(403).end();
+  }
 }));
 
 //exporting Router

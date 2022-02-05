@@ -62,10 +62,7 @@ module.exports = (sequelize) => {
       // }
     },
     // userId (created in the model associations with the foreignKey property, and equals the id from the Users table)
-  }, { 
-    // timestamps: false,
-    sequelize 
-  });
+  }, { sequelize });
 
   Course.associate = (models) => {
     // TODO Add associations.
