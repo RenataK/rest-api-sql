@@ -43,11 +43,11 @@ router.post('/users', asyncHandler(async (req, res) => {
 //A /api/courses GET route that will return all courses including the User associated with each course and a 200 HTTP status code.
 router.get('/courses', asyncHandler(async(req, res) => {
     const courses = await Course.findAll({
+      include: [{
+        model: User,
+        attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
+    }],
       attributes: { exclude: ['createdAt', 'updatedAt'] },
-        include: [{
-            model: User,
-            attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
-        }],
     });
     res.status(200).json({courses});
 }));
@@ -87,10 +87,19 @@ router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
 router.put('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
   const course = await Course.findByPk(req.params.id);
   if (course.userId == req.currentUser.id) {
-    await course.update(req.body);
+    await Course.update(req.body, 
+      {
+        where: {
+          id: req.params.id
+        }
+      });
     res.status(204).end();
+    console.log(req.currentUser.id);
+    console.log(course.userId);
   } else {
     res.status(403).json("Acess Denied");
+    console.log(req.currentUser.id);
+    console.log(course.userId);
   }
 }));
 
