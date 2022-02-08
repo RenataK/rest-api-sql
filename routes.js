@@ -10,13 +10,16 @@ const { asyncHandler } = require('./middleware/async-handler');
 const bcrypt = require('bcryptjs');
 const e = require('express');
 
+//User Routes
 
 //A /api/users GET route that will return all properties and values for the currently authenticated User along with a 200 HTTP status code.
 router.get('/users', authenticateUser, asyncHandler(async (req, res) => {
     const users = await User.findOne({
+      //returns only the authenticated user 
       where: {
         emailAddress: req.currentUser.emailAddress
       },
+        //excludes timestamps and password 
         attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
     });
     res.status(200).json({users});
@@ -29,6 +32,7 @@ router.post('/users', asyncHandler(async (req, res) => {
       await User.create(req.body);
       res.status(201).set('Location', '/').end();
     } catch (error) {
+      //SequelizeUniqueConstraintError error, returns a 400 status code and error message
       if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
         const errors = error.errors.map(err => err.message);
         res.status(400).json({ errors });   
@@ -38,15 +42,17 @@ router.post('/users', asyncHandler(async (req, res) => {
     }
   }));
 
-//Courses
+//Courses Routes
 
 //A /api/courses GET route that will return all courses including the User associated with each course and a 200 HTTP status code.
 router.get('/courses', asyncHandler(async(req, res) => {
     const courses = await Course.findAll({
+      //includes the user that's associated with the course
       include: [{
         model: User,
         attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }
     }],
+      //exludes the courses timestamps
       attributes: { exclude: ['createdAt', 'updatedAt'] },
     });
     res.status(200).json({courses});
@@ -71,8 +77,8 @@ router.get('/courses/:id', asyncHandler(async(req, res) => {
 router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
     try {
       const course = await Course.create(req.body);
-      //setting the URI for the created course
-      res.status(201).set('Location', '`/courses/${course.id}`').end();
+      //setting the URI to the created course url
+      res.status(201).set('Location', `/courses/${course.id}`).end();
     } catch (error) {
       if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
         const errors = error.errors.map(err => err.message);
@@ -94,12 +100,8 @@ router.put('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
         }
       });
     res.status(204).end();
-    console.log(req.currentUser.id);
-    console.log(course.userId);
   } else {
-    res.status(403).json("Acess Denied");
-    console.log(req.currentUser.id);
-    console.log(course.userId);
+    res.status(403).end();
   }
 }));
 

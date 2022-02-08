@@ -16,6 +16,7 @@ const app = express();
 
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
+// code that parses the json that's sent in the HTTP Request Body.
 app.use(express.json());
 
 // setup a friendly greeting for the root route
@@ -50,7 +51,8 @@ app.use((err, req, res, next) => {
 // set our port
 app.set('port', process.env.PORT || 5000);
 
-// Test the database connection.
+// Test the database connection. 
+//Used Sequelize's authenticate function to test the database connection.
 (async () => {
   try {
     await sequelize.authenticate();
