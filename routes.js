@@ -91,17 +91,26 @@ router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
 
 //A /api/courses/:id PUT route that will update the corresponding course and return a 204 HTTP status code and no content.
 router.put('/courses/:id', authenticateUser, asyncHandler(async(req, res) => {
-  const course = await Course.findByPk(req.params.id);
-  if (course.userId == req.currentUser.id) {
-    await Course.update(req.body, 
-      {
-        where: {
-          id: req.params.id
-        }
-      });
-    res.status(204).end();
-  } else {
-    res.status(403).end();
+  try {
+    const course = await Course.findByPk(req.params.id);
+    if (course.userId == req.currentUser.id) {
+      await Course.update(req.body, 
+        {
+          where: {
+            id: req.params.id
+          }
+        });
+      res.status(204).end();
+    } else {
+      res.status(403).end();
+    }
+  } catch (error) {
+    if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+      const errors = error.errors.map(err => err.message);
+      res.status(400).json({ errors });   
+    } else {
+      throw error;
+    }
   }
 }));
 
